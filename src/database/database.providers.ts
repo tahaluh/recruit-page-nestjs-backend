@@ -4,13 +4,14 @@ export const databaseProviders = [
   {
     provide: 'DATA_SOURCE',
     useFactory: async () => {
+      console.log(process.env.DB_HOST)
       const dataSource = new DataSource({
         type: 'mysql',
-        host: 'sql10.freemysqlhosting.net',
-        port: 3306,
-        username: 'sql10520647',
-        password: 'mQaChs49jd',
-        database: 'sql10520647',
+        host: process.env.DB_HOST,
+        port: parseInt(process.env.DB_PORT),
+        username: process.env.DB_USERNAME,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME,
         entities: [__dirname + '/../**/*.entity{.ts,.js}'],
         synchronize: false,
       });
