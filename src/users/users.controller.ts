@@ -46,7 +46,6 @@ export class UsersController {
 
   @Post('login-token')
   async loginToken(@Request() req, @Body() data) {
-    console.log(data)
     return this.authService.loginToken(req.user);
   }
 }
