@@ -1,5 +1,12 @@
-import { Injectable, Inject, HttpException, HttpStatus, forwardRef } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  HttpException,
+  HttpStatus,
+  forwardRef,
+} from '@nestjs/common';
 import { AuthService } from 'src/auth/auth.service';
+import { User } from 'src/users/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
 import { Token } from './token.entity';
@@ -28,15 +35,28 @@ export class TokenService {
     }
   }
 
-  async refreshToken(oldToken: string){
+  async refreshToken(oldToken: string) {
     let objToken = await this.tokenRepository.findOneBy({ hash: oldToken });
-    if (objToken){
-      let user = await this.usersService.findOneBy(objToken.username)
-      return this.authService.login(user)
+    if (objToken) {
+      let user = await this.usersService.findOneBy(objToken.username);
+      return this.authService.login(user);
     } else {
-      return new HttpException({
-        errorMessage: 'Token inválido'
-      }, HttpStatus.UNAUTHORIZED)
+      return new HttpException(
+        {
+          errorMessage: 'Token inválido',
+        },
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+  }
+
+  async getUserByToken(token: string): Promise<User>{
+    let objToken: Token = await this.tokenRepository.findOneBy({ hash: token });
+    if (objToken) {
+      let user = await this.usersService.findOneBy(objToken.username);
+      return user;
+    } else {
+      return null;
     }
   }
 }

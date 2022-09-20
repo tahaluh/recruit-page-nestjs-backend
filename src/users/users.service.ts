@@ -30,6 +30,12 @@ export class UsersService {
         };
       })
       .catch((error) => {
+        if (error.code === 'ER_DUP_ENTRY'){
+          return <ResultDto>{
+            status: false,
+            message: 'Esse email já está cadastrado, tente fazer login',
+          };
+        }
         return <ResultDto>{
           status: false,
           message: 'Houve um erro ao cadastar o usuário',
