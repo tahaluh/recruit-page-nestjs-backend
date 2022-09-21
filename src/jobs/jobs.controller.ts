@@ -43,7 +43,7 @@ export class JobsController {
     }
   }
 
-  @Get()
+  @Get('/findAll')
   findAll() {
     return this.jobsService.findAll();
   }

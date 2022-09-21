@@ -7,7 +7,7 @@ import { TokenController } from './token.controller';
 import { UsersModule } from 'src/users/users.module';
 
 @Module({
-  imports: [DatabaseModule, forwardRef(() => AuthModule), UsersModule],
+  imports: [DatabaseModule, forwardRef(() => AuthModule), forwardRef(() => UsersModule)],
   controllers: [TokenController],
   providers: [...tokenProviders, TokenService],
   exports: [TokenService]

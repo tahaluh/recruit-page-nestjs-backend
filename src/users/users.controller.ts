@@ -48,4 +48,12 @@ export class UsersController {
   async loginToken(@Request() req, @Body() data) {
     return this.authService.loginToken(data.token);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('update')
+  async update(@Request() req, @Body() data) {        
+    let token = req.headers.authorization;
+    return this.usersService.update(data, token);
+    
+  }
 }

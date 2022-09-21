@@ -37,8 +37,8 @@ export class JobsService {
       });
   }
 
-  findAll() {
-    return `This action returns all jobs`;
+  async findAll() {
+    return await this.jobsRepository.find()
   }
 
   findOne(id: number) {
