@@ -44,4 +44,9 @@ export class AuthService {
       );
     }
   }
+
+  async getUserByToken(token: string) {
+    let user: User = await this.tokenService.getUserByToken(token);
+    return user
+  }
 }

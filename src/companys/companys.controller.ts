@@ -1,4 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Inject, forwardRef } from '@nestjs/common';
+import { AuthService } from 'src/auth/auth.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ResultDto } from 'src/dto/result.dto';
 import { TokenService } from 'src/token/token.service';
@@ -10,14 +11,14 @@ import { UpdateCompanyDto } from './dto/update-company.dto';
 @Controller('company')
 export class CompanysController {
   constructor(private readonly companysService: CompanysService,
-    // private readonly tokenService: TokenService
+    private readonly authService: AuthService,
     ) {}
 
   @UseGuards(JwtAuthGuard)
   @Post('create')
   async create(@Body() data: CreateCompanyDto, @Req() req): Promise<ResultDto> {
     let token = req.headers.authorizarion;
-    let user: User = null //User = await this.tokenService.getUserByToken(token)
+    let user: User = await this.authService.getUserByToken(token)
     if (user){
       return this.companysService.create(data, user)
     }
