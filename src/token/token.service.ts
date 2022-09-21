@@ -28,7 +28,7 @@ export class TokenService {
         hash: hash,
       });
     } else {
-      this.tokenRepository.insert({
+      this.tokenRepository.save({
         hash: hash,
         username: username,
       });
@@ -37,9 +37,9 @@ export class TokenService {
 
   async refreshToken(oldToken: string) {
     let objToken = await this.tokenRepository.findOneBy({ hash: oldToken });
+    console.log("refresca "+objToken)
     if (objToken) {
       let user = await this.usersService.findOneBy(objToken.username);
-      console.log(await this.usersService.findOneBy(objToken.username))
       return this.authService.login(user);
     } else {
       return new HttpException(
@@ -51,9 +51,9 @@ export class TokenService {
     }
   }
 
-  async getUserByToken(token: string): Promise<User>{
-    token = token?token.replace("Bearer ", "").trim():token
-    let objToken: Token = await this.tokenRepository.findOne({where: { hash: token }});
+  async getUserByToken(token: string): Promise<User> {
+    token = token ? token.replace('Bearer ', '').trim() : token;
+    let objToken: Token = await this.tokenRepository.findOneBy({hash: token});
     if (objToken) {
       let user = await this.usersService.findOneBy(objToken.username);
       return user;
@@ -63,8 +63,13 @@ export class TokenService {
   }
 
   async deleteToken(token: string) {
-    token = token?token.replace("Bearer ", "").trim():token
-    let tokenObj = await this.tokenRepository.findOne({where: { hash: token }});
-    return await this.tokenRepository.remove(tokenObj);
+    token = token ? token.replace('Bearer ', '').trim() : token;
+    let tokenObj = await this.tokenRepository.findOne({
+      where: { hash: token },
+    });
+    if (tokenObj) {
+      return await this.tokenRepository.remove(tokenObj);
+    }
+    return 
   }
 }

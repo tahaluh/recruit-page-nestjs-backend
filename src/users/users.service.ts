@@ -16,7 +16,7 @@ export class UsersService {
     @Inject(forwardRef(() => TokenService))
     private tokenService: TokenService,
     @Inject(forwardRef(() => AuthService))
-    private authService: AuthService
+    private authService: AuthService,
   ) {}
 
   async findAll(): Promise<User[]> {
@@ -56,18 +56,20 @@ export class UsersService {
 
   async update(data: UserUpdateDto, token: string): Promise<ResultDto> {
     let user: User = await this.tokenService.getUserByToken(token);
-    this.tokenService.deleteToken(token)
-    if (user) {
+    if (user && bcrypt.compareSync(data.password, user.password)) {
+      this.tokenService.deleteToken(token);
       user.username = data.username ? data.username : user.username;
       user.email = data.email ? data.email : user.email;
-      user.password = data.newPassword ? data.newPassword : user.password;      
+      user.password = data.newPassword
+        ? bcrypt.hashSync(data.newPassword, 8)
+        : user.password;
       return this.usersRepository
         .save(user)
-        .then(async (result) => {          
+        .then(async (result) => {
           return <ResultDto>{
             status: true,
             message: 'Usuário atualizado com sucesso',
-            token: await this.authService.login(user)
+            access_token: (await this.authService.login(user)).access_token,
           };
         })
         .catch((error) => {
@@ -83,5 +85,9 @@ export class UsersService {
           };
         });
     }
+    return <ResultDto>{
+      status: false,
+      message: 'Houve um erro ao validar a sessão',
+    };
   }
 }
