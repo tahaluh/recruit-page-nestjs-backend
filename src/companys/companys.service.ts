@@ -12,14 +12,14 @@ export class CompanysService {
     private companysRepository: Repository<Company>,
   ) {}
 
-  async create(data: CreateCompanyDto): Promise<ResultDto> {
+  async create(data: CreateCompanyDto, user): Promise<ResultDto> {
     let company = new Company();
     console.log(data)
     company.address = data.address;
     company.cellphone = data.cellphone;
     company.name = data.name;
-    company.userId = company.userId;
-    company.website = company.website;
+    company.website = data.website;
+    company.user = data.user
 
     return this.companysRepository
       .save(company)
