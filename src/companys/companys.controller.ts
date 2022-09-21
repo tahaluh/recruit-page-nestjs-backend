@@ -11,14 +11,14 @@ import { UpdateCompanyDto } from './dto/update-company.dto';
 @Controller('company')
 export class CompanysController {
   constructor(private readonly companysService: CompanysService,
-    private readonly authService: AuthService,
+    private readonly tokenService: TokenService,
     ) {}
 
   @UseGuards(JwtAuthGuard)
   @Post('create')
   async create(@Body() data: CreateCompanyDto, @Req() req): Promise<ResultDto> {
     let token = req.headers.authorizarion;
-    let user: User = await this.authService.getUserByToken(token)
+    let user: User = await this.tokenService.getUserByToken(token)
     if (user){
       return this.companysService.create(data, user)
     }
