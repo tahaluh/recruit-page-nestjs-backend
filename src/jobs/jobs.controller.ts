@@ -1,15 +1,46 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Req,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { JobsService } from './jobs.service';
 import { CreateJobDto } from './dto/create-job.dto';
 import { UpdateJobDto } from './dto/update-job.dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { User } from 'src/users/user.entity';
+import { TokenService } from 'src/token/token.service';
+import { Company } from 'src/companys/company.entity';
+import { CompanysService } from 'src/companys/companys.service';
 
-@Controller('jobs')
+@Controller('job')
 export class JobsController {
-  constructor(private readonly jobsService: JobsService) {}
+  constructor(
+    private readonly jobsService: JobsService,
+    private readonly tokenService: TokenService,
+    private readonly companysService: CompanysService,
+  ) {}
 
-  @Post()
-  create(@Body() createJobDto: CreateJobDto) {
-    return this.jobsService.create(createJobDto);
+  @UseGuards(JwtAuthGuard)
+  @Post('create')
+  async create(@Body() data: CreateJobDto, @Req() req) {
+    let token = req.headers.authorization;
+    let user: User = await this.tokenService.getUserByToken(token);
+    let company: Company = await this.companysService.getCompanyByUser(user);
+    if (company){
+      return this.jobsService.create(data, company);
+    }else {
+      throw new HttpException({
+        errorMessage: 'Empresa inválida'
+      }, HttpStatus.UNAUTHORIZED)
+    }
   }
 
   @Get()

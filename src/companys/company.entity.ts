@@ -1,5 +1,6 @@
+import { Job } from 'src/jobs/job.entity';
 import { User } from 'src/users/user.entity';
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, OneToMany, JoinColumn } from 'typeorm';
 
 @Entity()
 export class Company {
@@ -18,6 +19,7 @@ export class Company {
     @Column({ length: 255})
     address: string;
 
-    @OneToOne(() => User, user => user.company)
-    user: User;
+    @OneToOne(() => User, (user) => user.company )
+    @JoinColumn()
+    user: User;  
 }

@@ -4,6 +4,7 @@ import { UpdateCompanyDto } from './dto/update-company.dto';
 import { Repository } from 'typeorm/repository/Repository';
 import { Company } from './company.entity';
 import { ResultDto } from 'src/dto/result.dto';
+import { User } from 'src/users/user.entity';
 
 @Injectable()
 export class CompanysService {
@@ -18,7 +19,7 @@ export class CompanysService {
     company.cellphone = data.cellphone;
     company.name = data.name;
     company.website = data.website;
-    company.user = data.user
+    company.user = user;
 
     return this.companysRepository
       .save(company)
@@ -56,5 +57,14 @@ export class CompanysService {
 
   remove(id: number) {
     return `This action removes a #${id} company`;
+  }
+
+  async getCompanyByUser(user: User): Promise<Company> {
+    let objCompany: Company = await this.companysRepository.findOneBy({ user })
+    if (objCompany) {
+      return objCompany
+    } else {
+      return null;
+    }
   }
 }

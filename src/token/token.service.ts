@@ -51,8 +51,8 @@ export class TokenService {
   }
 
   async getUserByToken(token: string): Promise<User>{
-    token = token.replace("Bearer ", "").trim()
-    let objToken: Token = await this.tokenRepository.findOneBy({ hash: token });
+    token = token?token.replace("Bearer ", "").trim():token
+    let objToken: Token = await this.tokenRepository.findOne({where: { hash: token }});
     if (objToken) {
       let user = await this.usersService.findOneBy(objToken.username);
       return user;
