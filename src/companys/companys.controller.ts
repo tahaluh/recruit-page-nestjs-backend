@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Inject, forwardRef } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req, Inject, forwardRef, HttpException, HttpStatus } from '@nestjs/common';
 import { AuthService } from 'src/auth/auth.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ResultDto } from 'src/dto/result.dto';
@@ -17,10 +17,14 @@ export class CompanysController {
   @UseGuards(JwtAuthGuard)
   @Post('create')
   async create(@Body() data: CreateCompanyDto, @Req() req): Promise<ResultDto> {
-    let token = req.headers.authorizarion;
+    let token = req.headers.authorization;
     let user: User = await this.tokenService.getUserByToken(token)
     if (user){
       return this.companysService.create(data, user)
+    }else {
+      throw new HttpException({
+        errorMessage: 'Token inválido'
+      }, HttpStatus.UNAUTHORIZED)
     }
   }
 

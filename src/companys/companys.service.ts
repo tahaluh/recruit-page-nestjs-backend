@@ -14,7 +14,6 @@ export class CompanysService {
 
   async create(data: CreateCompanyDto, user): Promise<ResultDto> {
     let company = new Company();
-    console.log(data)
     company.address = data.address;
     company.cellphone = data.cellphone;
     company.name = data.name;
