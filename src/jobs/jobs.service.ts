@@ -47,19 +47,47 @@ export class JobsService {
     return this.jobsRepository
       .findOneBy({ id })
       .then((response) => {
-        if(response){
-          return response
+        if (response) {
+          return response;
         }
         return <ResultDto>{
           status: false,
           message: 'A vaga não existe',
         };
-      }).catch((error) => {
+      })
+      .catch((error) => {
         return <ResultDto>{
           status: false,
           message: 'Ocorreu um erro ao verificar a vaga',
         };
       });
+  }
+
+  findAllByCompany(company: Company) {
+    if (company) {
+      return this.jobsRepository
+        .findBy({ company })
+        .then((response) => {
+          if (response) {
+            return response;
+          }
+          return <ResultDto>{
+            status: false,
+            message: 'A vaga não existe',
+          };
+        })
+        .catch((error) => {
+          return <ResultDto>{
+            status: false,
+            message: 'Ocorreu um erro ao verificar a vaga',
+          };
+        });
+    }else {
+      return <ResultDto>{
+        status: false,
+        message: 'Sessão inválida',
+      };
+    }
   }
 
   update(id: number, updateJobDto: UpdateJobDto) {

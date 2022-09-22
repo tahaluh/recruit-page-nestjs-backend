@@ -6,6 +6,7 @@ import {
   forwardRef,
 } from '@nestjs/common';
 import { AuthService } from 'src/auth/auth.service';
+import { ResultDto } from 'src/dto/result.dto';
 import { User } from 'src/users/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
@@ -36,10 +37,19 @@ export class TokenService {
   }
 
   async refreshToken(oldToken: string) {
-    let objToken = await this.tokenRepository.findOneBy({ hash: oldToken });
-    if (objToken) {
-      let user = await this.usersService.findOneBy(objToken.username);
-      return this.authService.login(user);
+    if (oldToken) {
+      let objToken = await this.tokenRepository.findOneBy({ hash: oldToken });
+      if (objToken) {
+        let user = await this.usersService.findOneBy(objToken.username);
+        return this.authService.login(user);
+      } else {
+        return new HttpException(
+          {
+            errorMessage: 'Token inválido',
+          },
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
     } else {
       return new HttpException(
         {
@@ -52,7 +62,7 @@ export class TokenService {
 
   async getUserByToken(token: string): Promise<User> {
     token = token ? token.replace('Bearer ', '').trim() : token;
-    let objToken: Token = await this.tokenRepository.findOneBy({hash: token});
+    let objToken: Token = await this.tokenRepository.findOneBy({ hash: token });
     if (objToken) {
       let user = await this.usersService.findOneBy(objToken.username);
       return user;
@@ -69,7 +79,7 @@ export class TokenService {
     if (tokenObj) {
       return await this.tokenRepository.remove(tokenObj);
     }
-    return 
+    return;
   }
 
   async updateToken(token: string, username: string) {
@@ -77,9 +87,30 @@ export class TokenService {
     let tokenObj = await this.tokenRepository.findOne({
       where: { hash: token },
     });
-    tokenObj.username = username
-    if (tokenObj){
-      return await this.tokenRepository.save(tokenObj)
+    tokenObj.username = username;
+    if (tokenObj) {
+      return await this.tokenRepository.save(tokenObj);
+    } else {
+      return;
+    }
+  }
+
+  async verifyToken(token: string) {
+    token = token ? token.replace('Bearer ', '').trim() : token;
+    let tokenObj = await this.tokenRepository.findOne({
+      where: { hash: token },
+    });
+    console.log(tokenObj);
+    if (tokenObj) {
+      return <ResultDto>{
+        status: true,
+        message: 'O token é válido',
+      };
+    } else {
+      return <ResultDto>{
+        status: false,
+        message: 'O token é inválido',
+      };
     }
   }
 }

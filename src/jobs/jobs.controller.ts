@@ -19,6 +19,7 @@ import { User } from 'src/users/user.entity';
 import { TokenService } from 'src/token/token.service';
 import { Company } from 'src/companys/company.entity';
 import { CompanysService } from 'src/companys/companys.service';
+import { get } from 'http';
 
 @Controller('job')
 export class JobsController {
@@ -46,6 +47,14 @@ export class JobsController {
   @Get('/findAll')
   findAll() {
     return this.jobsService.findAll();
+  }
+
+  @Get('/findAllByUser')
+  async findAllByCompany(@Body() data: CreateJobDto, @Req() req) {
+    let token = req.headers.authorization;
+    let user: User = await this.tokenService.getUserByToken(token);
+    let company: Company = await this.companysService.getCompanyByUser(user);
+    return this.jobsService.findAllByCompany(company);
   }
 
   @Get(':id')

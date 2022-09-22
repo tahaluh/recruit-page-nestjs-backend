@@ -77,9 +77,21 @@ export class CompanysController {
     return this.companysService.findOne(+id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCompanyDto: UpdateCompanyDto) {
-    return this.companysService.update(+id, updateCompanyDto);
+  async update(@Body() data: UpdateCompanyDto, @Req() req) {
+    let token = req.headers.authorization;
+    let user: User = await this.tokenService.getUserByToken(token);
+    if (user) {
+      return this.companysService.update(data, user);
+    } else {
+      throw new HttpException(
+        {
+          errorMessage: 'Token inválido',
+        },
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
   }
 
   @Delete(':id')

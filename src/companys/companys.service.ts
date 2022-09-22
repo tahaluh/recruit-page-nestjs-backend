@@ -78,8 +78,32 @@ export class CompanysService {
     });
   }
 
-  update(id: number, updateCompanyDto: UpdateCompanyDto) {
-    return `This action updates a #${id} company`;
+  async update(data: UpdateCompanyDto, user: User) {
+    let company = await this.getCompanyByUser(user)
+
+    if(company){
+      company.address = data.address ? data.address : company.address
+      company.cellphone = data.cellphone ? data.cellphone : company.cellphone
+      company.name = data.name ? data.name : company.name
+      company.website = data.website ? data.website : company.website;
+
+      return this.companysRepository.save(company).then((response)=>{
+        return <ResultDto>{
+          status: true,
+          message: 'Empresa Atualizada com sucesso',
+        };
+      })
+      .catch((error)=>{
+        return <ResultDto>{
+          status: false,
+          message: 'Houve um erro ao atualizar a empresa',
+        };
+      })
+    }
+    return <ResultDto>{
+      status: false,
+      message: 'Houve um erro ao validar a sessão',
+    };
   }
 
   remove(id: number) {
