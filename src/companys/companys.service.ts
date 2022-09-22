@@ -111,6 +111,9 @@ export class CompanysService {
   }
 
   async getCompanyByUser(user: User): Promise<Company> {
+    if(!user){
+      return null
+    }
     let objCompany: Company = await this.companysRepository.findOneBy({ user })
     if (objCompany) {
       return objCompany

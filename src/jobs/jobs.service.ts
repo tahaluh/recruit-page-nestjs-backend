@@ -82,7 +82,7 @@ export class JobsService {
             message: 'Ocorreu um erro ao verificar a vaga',
           };
         });
-    }else {
+    } else {
       return <ResultDto>{
         status: false,
         message: 'Sessão inválida',
@@ -94,7 +94,43 @@ export class JobsService {
     return `This action updates a #${id} job`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} job`;
+  async remove(id: number, company: Company) {
+    return this.jobsRepository
+      .findOneBy({ id, company })
+      .then((response) => {
+        let job: Job = response;
+        if (response) {
+          return this.jobsRepository
+            .remove(job)
+            .then(() => {
+              if (response) {
+                return <ResultDto>{
+                  status: true,
+                  message: 'A vaga foi deletada com sucesso',
+                };
+              }
+              return <ResultDto>{
+                status: false,
+                message: 'Houve um erro desconhecido ao deletar a vaga',
+              };
+            })
+            .catch(() => {
+              return <ResultDto>{
+                status: false,
+                message: 'Houve um erro desconhecido ao deletar a vaga',
+              };
+            });
+        }
+        return <ResultDto>{
+          status: false,
+          message: 'A vaga não existe ou a sessão está inválida',
+        };
+      })
+      .catch((error) => {
+        return <ResultDto>{
+          status: false,
+          message: 'Ocorreu um erro ao verificar a vaga',
+        };
+      });
   }
 }

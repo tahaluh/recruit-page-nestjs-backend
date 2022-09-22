@@ -35,15 +35,19 @@ export class JobsController {
     let token = req.headers.authorization;
     let user: User = await this.tokenService.getUserByToken(token);
     let company: Company = await this.companysService.getCompanyByUser(user);
-    if (company){
+    if (company) {
       return this.jobsService.create(data, company);
-    }else {
-      throw new HttpException({
-        errorMessage: 'Empresa inválida'
-      }, HttpStatus.UNAUTHORIZED)
+    } else {
+      throw new HttpException(
+        {
+          errorMessage: 'Empresa inválida',
+        },
+        HttpStatus.UNAUTHORIZED,
+      );
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('/findAll')
   findAll() {
     return this.jobsService.findAll();
@@ -54,11 +58,20 @@ export class JobsController {
     let token = req.headers.authorization;
     let user: User = await this.tokenService.getUserByToken(token);
     let company: Company = await this.companysService.getCompanyByUser(user);
-    return this.jobsService.findAllByCompany(company);
+    if (company) {
+      return this.jobsService.findAllByCompany(company);
+    } else {
+      throw new HttpException(
+        {
+          errorMessage: 'Empresa inválida',
+        },
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {    
+  findOne(@Param('id') id: string) {
     console.log(id);
     return this.jobsService.findOne(+id);
   }
@@ -69,7 +82,19 @@ export class JobsController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.jobsService.remove(+id);
+  async remove(@Param('id') id: string, @Req() req) {
+    let token = req.headers.authorization;
+    let user: User = await this.tokenService.getUserByToken(token);
+      let company: Company = await this.companysService.getCompanyByUser(user);
+    if (company) {      
+      return this.jobsService.remove(+id, company);
+    } else {
+      throw new HttpException(
+        {
+          errorMessage: 'Sessão inválida',
+        },
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
   }
 }
