@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { response } from 'express';
 import { Company } from 'src/companys/company.entity';
 import { ResultDto } from 'src/dto/result.dto';
 import { Repository } from 'typeorm';
@@ -16,6 +17,7 @@ export class JobsService {
   create(data: CreateJobDto, company: Company): Promise<ResultDto> {
     let job = new Job();
     job.company = company;
+    job.office = data.office;
     job.description = data.description;
     job.end_date = new Date(data.end_date);
     job.salary = data.salary;
@@ -38,11 +40,26 @@ export class JobsService {
   }
 
   async findAll() {
-    return await this.jobsRepository.find()
+    return await this.jobsRepository.find();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} job`;
+    return this.jobsRepository
+      .findOneBy({ id })
+      .then((response) => {
+        if(response){
+          return response
+        }
+        return <ResultDto>{
+          status: false,
+          message: 'A vaga não existe',
+        };
+      }).catch((error) => {
+        return <ResultDto>{
+          status: false,
+          message: 'Ocorreu um erro ao verificar a vaga',
+        };
+      });
   }
 
   update(id: number, updateJobDto: UpdateJobDto) {

@@ -49,7 +49,8 @@ export class JobsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: string) {    
+    console.log(id);
     return this.jobsService.findOne(+id);
   }
 

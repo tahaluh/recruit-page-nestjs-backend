@@ -9,6 +9,9 @@ export class Job {
     @Column({ length: 255})
     description: string;
 
+    @Column({ length: 45})
+    office: string;
+
     @Column({ length: 255})
     skills: string;
 

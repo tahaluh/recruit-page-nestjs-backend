@@ -57,7 +57,7 @@ export class UsersService {
   async update(data: UserUpdateDto, token: string): Promise<ResultDto> {
     let user: User = await this.tokenService.getUserByToken(token);
     if (user && bcrypt.compareSync(data.password, user.password)) {
-      this.tokenService.deleteToken(token);
+      this.tokenService.updateToken(token, user.username);
       user.username = data.username ? data.username : user.username;
       user.email = data.email ? data.email : user.email;
       user.password = data.newPassword

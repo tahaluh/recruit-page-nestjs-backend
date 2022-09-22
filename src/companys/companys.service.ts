@@ -43,12 +43,39 @@ export class CompanysService {
       });
   }
 
+  findCompanyByUser(user: User) {
+    return this.companysRepository.findOneBy({user}).then((response) => {
+      return response
+    }).catch((error) => {
+      return <ResultDto>{
+        status: false,
+        message: 'Ocorreu um erro ao verificar a empresa',
+      };
+    });
+  }
+
   findAll() {
     return `This action returns all companys`;
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} company`;
+    return this.companysRepository.findOneBy({id}).then((response) => {
+      if(response){
+        return <ResultDto>{
+          status: true,
+          message: 'A empresa existe',
+        };
+      }
+      return <ResultDto>{
+        status: false,
+        message: 'A empresa não existe',
+      };
+    }).catch((error) => {
+      return <ResultDto>{
+        status: false,
+        message: 'Ocorreu um erro ao verificar a empresa',
+      };
+    });
   }
 
   update(id: number, updateCompanyDto: UpdateCompanyDto) {

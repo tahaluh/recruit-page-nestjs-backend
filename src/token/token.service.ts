@@ -37,7 +37,6 @@ export class TokenService {
 
   async refreshToken(oldToken: string) {
     let objToken = await this.tokenRepository.findOneBy({ hash: oldToken });
-    console.log("refresca "+objToken)
     if (objToken) {
       let user = await this.usersService.findOneBy(objToken.username);
       return this.authService.login(user);
@@ -71,5 +70,16 @@ export class TokenService {
       return await this.tokenRepository.remove(tokenObj);
     }
     return 
+  }
+
+  async updateToken(token: string, username: string) {
+    token = token ? token.replace('Bearer ', '').trim() : token;
+    let tokenObj = await this.tokenRepository.findOne({
+      where: { hash: token },
+    });
+    tokenObj.username = username
+    if (tokenObj){
+      return await this.tokenRepository.save(tokenObj)
+    }
   }
 }
