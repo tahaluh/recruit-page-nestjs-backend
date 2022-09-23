@@ -47,12 +47,12 @@ export class JobsController {
     }
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get('/findAll')
   findAll() {
     return this.jobsService.findAll();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('/findAllByUser')
   async findAllByCompany(@Body() data: CreateJobDto, @Req() req) {
     let token = req.headers.authorization;
